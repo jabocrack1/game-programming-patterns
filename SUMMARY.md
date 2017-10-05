@@ -6,6 +6,7 @@
 * [Обзор шаблонов проектирования](obzor-shablonov-proektirovaniya.md)
   * [Команда \(Command\)](obzor-shablonov-proektirovaniya/komanda-command.md)
   * [Приспособленец \(Flyweight\)](obzor-shablonov-proektirovaniya/prisposoblenets-flyweight.md)
+  * [Наблюдатель \(Observer\)](obzor-shablonov-proektirovaniya/nablyudatel-observer.md)
 * Последовательные шаблоны \(Sequencing Patterns\)
 * Поведенческие шаблоны \(Behavioral Patterns\)
 * Шаблоны снижения связности \(Decoupling Patterns\)
