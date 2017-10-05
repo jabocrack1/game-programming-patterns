@@ -209,42 +209,25 @@ if (command) {
 Мы уже оценили удобство использования команды для абстрагирования пользовательского ввода, поэтому каждый ход игрока у нас уже инкапсулирован в команду. Например, движение юнита может выглядеть следующим образом:
 
 ```
-class
- MoveUnitCommand : 
-public
- Command
+class MoveUnitCommand : public Command
 {
 
-public
-:
-        MoveUnitCommand(Unit* unit, 
-int
- x, 
-int
- y):
+    public:
+        MoveUnitCommand(Unit* unit, int x, int y):
             unit_(unit),
             x_(x),
             y_(y)
         {}
 
 
-virtual
-void
-execute
-()
-{
-            unit_-
->
-moveTo(x_, y_);
+        virtual void execute()
+        {
+            unit_->moveTo(x_, y_);
         }
 
-
-private
-:
+    private:
         Unit* unit_;
-
-int
- x_, y_;
+        int x_, y_;
 };
 ```
 
@@ -255,58 +238,27 @@ int
 А вот более специфическая команда. Она описывает вещи, которые можно сделать в определенный момент. Это значит, что код обработчика ввода будет _создаваться_ каждый раз, когда игрок решит двинутся. Выглядеть это будет следующим образом:
 
 ```
-Command* 
-handleInput
-()
+Command* handleInput()
 {
 
-// Выбираем юнит...
-
+    // Выбираем юнит...
     Unit* unit = getSelectedUnit();
 
-
-if
- (isPressed(BUTTON_UP)) {
-
-// Перемещаем юнит на единицу вверх.
-int
- destY = unit-
->
-y() - 
-1
-;
-
-return
-new
- MoveUnitCommand(unit, unit-
->
-x(), destY);
+    if (isPressed(BUTTON_UP)) {
+        // Перемещаем юнит на единицу вверх.
+        int destY = unit->y() - 1;
+        return new MoveUnitCommand(unit, unit->x(), destY);
     }
 
-
-if
- (isPressed(BUTTON_DOWN)) {
-
-// Перемещаем юнит на единицу вниз.
-int
- destY = unit-
->
-y() + 
-1
-;
-
-return
-new
- MoveUnitCommand(unit, unit-
->
-x(), destY);
+    if (isPressed(BUTTON_DOWN)) {
+        // Перемещаем юнит на единицу вниз.
+        int destY = unit->y() + 1;
+        return new MoveUnitCommand(unit, unit->x(), destY);
     }
 
-
-// Другие шаги...
-return
-NULL
-;
+    // Другие шаги...
+    return
+    NULL;
 }
 ```
 
@@ -315,104 +267,49 @@ NULL
 Тот факт, что команды получаются одноразовыми, дает нам определенные преимущества. Чтобы сделать команды отменяемыми, мы определим еще одну операцию, которую должен реализовывать каждый класс команд:
 
 ```
-class
- Command
+class Command
 {
+  public:
+      virtual ~Command() {}
+      virtual void execute() = 0;
 
-public
-:
-
-virtual
- ~Command() {}
-
-virtual
-void
-execute
-()
-= 
-0
-;
-
-virtual
-void
-undo
-()
-= 
-0
-;
+      virtual void undo() = 0;
 };
 ```
 
 Метод `undo()` возвращает игру в то состояние, в котором она была до выполнения соответствующего метода `execute()`. Вот наша последняя команда, дополненная поддержкой отмены:
 
 ```
-class
- MoveUnitCommand : 
-public
- Command
+class MoveUnitCommand : public Command
 {
 
-public
-:
-        MoveUnitCommand(Unit* unit, 
-int
- x, 
-int
- y): 
+    public:
+        MoveUnitCommand(Unit* unit, int x, int y): 
             unit_(unit),
-            xBefore_(
-0
-),
-            yBefore_(
-0
-),
+            xBefore_(0),
+            yBefore_(0),
             x_(x),
             y_(y)
         {}
 
+         virtual void execute() {
 
-virtual
-void
-execute
-()
-{
+            // Запоминаем позицию юнита перед ходом
+            // чтобы потом ее восстановить.
 
-// Запоминаем позицию юнита перед ходом
-// чтобы потом ее восстановить.
-
-            xBefore_ = unit_-
->
-x();
-            yBefore_ = unit_-
->
-y();
-
-            unit_-
->
-moveTo(x_, y_);
+            xBefore_ = unit_->x();
+            yBefore_ = unit_->y();
+            unit_->moveTo(x_, y_);
         }
 
-
-virtual
-void
-undo
-()
-{
-            unit_-
->
-moveTo(xBefore_, yBefore_);
+        virtual void undo() {
+            unit_->moveTo(xBefore_, yBefore_);
         }
 
-
-private
-:
+        private:
         Unit* unit_;
-
-int
- xBefore_, yBefore_;
-
-int
- x_, y_;
+        int xBefore_, yBefore_;
+        int x_, y_;
     };
 ```
 
@@ -453,54 +350,31 @@ int
 Например, если мы пишем игру на `JavaScript`, мы можем написать команду движения следующим образом:
 
 ```
-function
-makeMoveUnitCommand
-(
-unit, x, y
-) 
+function makeMoveUnitCommand(unit, x, y) 
 {
-
-// эта функция представляет собой объект команды:
-return
-function
-(
-) 
-{
-        unit.moveTo(x, y);
-    }
+        // эта функция представляет собой объект команды:
+        return function() 
+        {
+                unit.moveTo(x, y);
+        }
 }
 ```
 
 С помощью пары замыканий мы можем реализовать отмену и повтор:
 
 ```
-function
-makeMoveUnitCommand
-(
-unit, x, y
-) 
+function makeMoveUnitCommand(unit, x, y) 
 {
-
-var
- xBefore, yBefore;
-
-
-return
- {
-        undo: 
-function
-(
-) 
-{
+    var xBefore, yBefore;
+    return {
+        undo: function() 
+        {
             xBefore = unit.x();
             yBefore = unit.y();
             unit.moveTo(x, y);
         },
-        redo: 
-function
-(
-) 
-{
+        redo: function() 
+        {
             unit.moveTo(xBefore, yBefore);
         }
     };
