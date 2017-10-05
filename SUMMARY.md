@@ -10,8 +10,8 @@
   * [Прототип \(Prototype\)](obzor-shablonov-proektirovaniya/prototip-prototype.md)
   * [Синглтон \(Singleton\)](obzor-shablonov-proektirovaniya/singlton-singleton.md)
   * [Состояние \(State\)](obzor-shablonov-proektirovaniya/sostoyanie-state.md)
-* Последовательные шаблоны \(Sequencing Patterns\)
-* Поведенческие шаблоны \(Behavioral Patterns\)
-* Шаблоны снижения связности \(Decoupling Patterns\)
-* Шаблоны оптимизации
+* [Последовательные шаблоны \(Sequencing Patterns\)](posledovatelnie-shabloni-sequencing-patterns.md)
+* [Поведенческие шаблоны \(Behavioral Patterns\)](povedencheskie-shabloni-behavioral-patterns.md)
+* [Шаблоны снижения связности \(Decoupling Patterns\)](shabloni-snizheniya-svyaznosti-decoupling-patterns.md)
+* [Шаблоны оптимизации](shabloni-optimizatsii.md)
 
