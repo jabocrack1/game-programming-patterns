@@ -37,24 +37,12 @@
 Самая примитивная реализация выглядит следующим образом:
 
 ```
-void
- InputHandler::handleInput()
+void InputHandler::handleInput()
 {
-
-if
- (isPressed(BUTTON_X)) jump();
-
-else
-if
- (isPressed(BUTTON_Y)) fireGun();
-
-else
-if
- (isPressed(BUTTON_A)) swapWeapon();
-
-else
-if
- (isPressed(BUTTON_B)) lurchIneffectively();
+  if (isPressed(BUTTON_X)) jump();
+  else if (isPressed(BUTTON_Y)) fireGun();
+  else if (isPressed(BUTTON_A)) swapWeapon();
+  else if (isPressed(BUTTON_B)) lurchIneffectively();
 }
 ```
 
@@ -67,23 +55,11 @@ if
 Для начала определим базовый класс, представляющий запускаемую игровую команду:
 
 ```
-class
- Command
+class Command 
 {
-
-public
-:
-
-virtual
- ~Command() {}
-
-virtual
-void
-execute
-()
-= 
-0
-;
+  public:
+   virtual ~Command() {}
+   virtual void execute() = 0;
 };
 ```
 
@@ -92,37 +68,16 @@ execute
 Теперь создадим дочерние классы для каждой из различных игровых команд:
 
 ```
-class
- JumpCommand : 
-public
- Command
+class JumpCommand : public Command
 {
-
-public
-:
-
-virtual
-void
-execute
-()
-{ jump(); }
+    public:
+      virtual void execute() { jump(); }
 };
 
-
-class
- FireCommand : 
-public
- Command
+class FireCommand : public Command
 {
-
-public
-:
-
-virtual
-void
-execute
-()
-{ fireGun(); }
+    public:
+        virtual void execute() { fireGun(); }
 };
 
 
@@ -132,58 +87,30 @@ execute
 В нашем обработчике ввода мы будем хранить указатели на команду для каждой кнопки:
 
 ```
-class
- InputHandler
+class InputHandler
 {
 
-public
-:
+        public:
+                void handleInput();
 
-void
-handleInput
-()
-;
-
-
-// Методы для привязки команд...
-private
-:
-        Command* buttonX_;
-        Command* buttonY_;
-        Command* buttonA_;
-        Command* buttonB_;
+        // Методы для привязки команд...
+        private:
+                Command* buttonX_;
+                Command* buttonY_;
+                Command* buttonA_;
+                Command* buttonB_;
 };
 ```
 
 Теперь обработка ввода сводится к делегированию такого вида:
 
 ```
-void
- InputHandler::handleInput()
+void InputHandler::handleInput()
 {
-
-if
- (isPressed(BUTTON_X)) buttonX_-
->
-execute();
-
-else
-if
- (isPressed(BUTTON_Y)) buttonY_-
->
-execute();
-
-else
-if
- (isPressed(BUTTON_A)) buttonA_-
->
-execute();
-
-else
-if
- (isPressed(BUTTON_B)) buttonB_-
->
-execute();
+  if (isPressed(BUTTON_X)) buttonX_->execute();
+  else if (isPressed(BUTTON_Y)) buttonY_->execute();
+  else if (isPressed(BUTTON_A)) buttonA_->execute();
+  else if (isPressed(BUTTON_B)) buttonB_->execute();
 }
 ```
 
@@ -204,49 +131,24 @@ execute();
 Такое предположение значительно снижает применимость наших команд. Получается что команда `JumpCommand` - это единственное, что способно заставить прыгать только нашего игрока. Давайте избавимся от этого ограничения. Вместо того чтобы запускать функцию, которая будет сама искать объект для воздействия, мы сами _передадим_ ей объект, которым хотим управлять:
 
 ```
-class
- Command
+class Command
 {
-
-public
-:
-
-virtual
- ~Command() {}
-
-virtual
-void
-execute
-(GameActor
-&
- actor)
-= 
-0
-;
+  public:
+    virtual ~Command() {}
+    virtual void execute(GameActor& actor) = 0;
 };
 ```
 
 Здесь в качестве `GameActor` выступает наш класс "игровой объект", представляющий игрока в игровом мире. Мы передаем его в `execute()` и, таким образом, изолированная команда получает возможность вызвать метод выбранного нами актера:
 
 ```
-class
- JumpCommand : 
-public
- Command
+class JumpCommand : public Command
 {
-
-public
-:
-
-virtual
-void
-execute
-(GameActor
-&
- actor)
-{
-            actor.jump();
-        }
+  public:
+     virtual void execute(GameActor& actor)
+     {
+         actor.jump();
+     }
 };
 ```
 
@@ -256,31 +158,13 @@ execute
 Command* InputHandler::handleInput()
 {
 
-if
- (isPressed(BUTTON_X)) 
-return
- buttonX_;
+  if (isPressed(BUTTON_X)) return buttonX_;
+  if (isPressed(BUTTON_Y)) return buttonY_;
+  if (isPressed(BUTTON_A)) return buttonA_;
+  if (isPressed(BUTTON_B)) return buttonB_;
 
-if
- (isPressed(BUTTON_Y)) 
-return
- buttonY_;
-
-if
- (isPressed(BUTTON_A)) 
-return
- buttonA_;
-
-if
- (isPressed(BUTTON_B)) 
-return
- buttonB_;
-
-
-// Если ничего не передано, то ничего и не делаем.
-return
-NULL
-;
+  // Если ничего не передано, то ничего и не делаем.
+  return NULL;
 }
 ```
 
@@ -291,12 +175,8 @@ NULL
 ```
 Command* command = inputHandler.handleInput();
 
-if
- (command)
-{
-    command-
->
-execute(actor);
+if (command) {
+    command->execute(actor);
 }
 ```
 
