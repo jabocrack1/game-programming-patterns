@@ -4,8 +4,6 @@
 
 О таких сценах внутри игры мы, как игровые разработчики, и мечтаем. И именно для таких сцен как нельзя лучше подходит скромный шаблон с именем Приспособленец \(Flyweight\).
 
-
-
 ## [Лес для деревьев](file:///D:/Users/a.lemekhov/Documents/game_programming_patterns_content/2.2-flyweight.html#forest-for-trees) {#лес-для-деревьев}
 
 Я могу описать целый лес всего несколькими предложениями, но _реализация_ его в настоящей игре - совсем другая история. Если вам захочется вывести на экране весь лес из индивидуальных деревьев целиком, любой графический программист сразу увидит миллионы полигонов, которые придется обработать видеокарте на каждом кадре.
@@ -22,26 +20,19 @@
 Если набросать описывающий все это код, получится нечто подобное:
 
 ```
-class
- Tree
+class Tree
 {
-    
-private
-:
-        Mesh mesh_;
-        Texture bark_;
-        Texture leaves_;
-        Vector position_;
-        
-double
- height_;
-        
-double
- thickness_;
-        Color barkTint_;
-        Color leafTint_;
-};
 
+        private:
+                Mesh mesh_;
+                Texture bark_;
+                Texture leaves_;
+                Vector position_;
+                double height_;
+                double thickness_;
+                Color barkTint_;
+                Color leafTint_;
+};
 ```
 
 Целая куча данных и здоровенные полигональная сетка и текстура. Весь лес определенно не получится запихнуть целиком в видеокарту на каждом кадре. К счастью есть проверенный временем способ обойти это ограничение.
@@ -57,41 +48,29 @@ double
 Мы можем смоделировать это явным образом путем разделения объекта пополам. Во-первых, мы достанем данные, общие для всех деревьев, и переместим их в отдельный класс:
 
 ```
-class
- TreeModel
+class TreeModel
 {
-    
-private
-:
-      Mesh mesh_;
-      Texture bark_;
-      Texture leaves_;
+      private:
+            Mesh mesh_;
+            Texture bark_;
+            Texture leaves_;
 };
-
 ```
 
 Игре нужен только один экземпляр этого класса, потому что нам незачем иметь тысячи копий одной и той же сетки и текстуры. Поэтому каждый _экземпляр_ дерева в мире должен иметь _ссылку_ на общий `TreeModel`. В `Tree` останутся данные, индивидуальные для каждого экземпляра:
 
 ```
-class
- Tree
+class Tree
 {
-    
-private
-:
-      TreeModel* model_;
-
-      Vector position_;
-      
-double
- height_;
-      
-double
- thickness_;
-      Color barkTint_;
-      Color leafTint_;
+      private:
+            TreeModel* model_;
+            
+            Vector position_;
+            double height_;
+            double thickness_;
+            Color barkTint_;
+            Color leafTint_;
 };
-
 ```
 
 Результат можно изобразить следующим образом:
@@ -104,8 +83,6 @@ double
 
 Это конечно все хорошо и экономит нам кучу памяти, но как это поможет нам в рендеринге? Прежде чем лес появится на экране, его нужно пропустить через память видеокарты. Нам нужно организовать разделение ресурсов таким образом чтобы это было понятно видеокарте.
 
-
-
 ## [Тысяча экземпляров](file:///D:/Users/a.lemekhov/Documents/game_programming_patterns_content/2.2-flyweight.html#thousand-instances) {#тысяча-экземпляров}
 
 Для того чтобы минимизировать количество данных, передаваемых видеокарте, мы будем передавать общие данные, т.е. `TreeModel` только _один раз_. После этого мы будем по отдельности передавать индивидуальные для каждого экземпляра данные - позицию, цвет и размер. А затем просто скомандуем видеокарте "Используй эту модель для отрисовки всех этих экземпляров".
@@ -115,8 +92,6 @@ double
 В обеих API вы формируете два потока данных. Первый - это общие данные, которые используются много раз - сетки и текстуры, как в нашем примере. Второй - список экземпляров и их параметры, которые позволяют варьировать данные из первой группы данных во время отрисовки. Весь лес появляется после единственного вызова отрисовки.
 
 > Сам по себе этот API видеокарты свидетельствует о том что шаблон Приспособленец - единственный из шаблонов банды четырех, получивший аппаратную реализацию.
-
-
 
 ## [Шаблон приспособленец](file:///D:/Users/a.lemekhov/Documents/game_programming_patterns_content/2.2-flyweight.html#flyweight-pattern) {#шаблон-приспособленец}
 
@@ -131,8 +106,6 @@ double
 То что мы до сих пор видели, выглядит как простое разделение ресурсов и вряд ли заслуживает того, чтобы называться шаблоном. Частично это вызвано тем, что в нашем примере присутствует очевидное _свойство_ \(identity\), выделяемое в качестве разделяемого ресурса - `TreeModel`.
 
 Я считаю этот шаблон менее очевидным \(и поэтому более хитрым\), когда он используется в случае, где выделить свойства для разделяемого объекта не так легко. В таком случае возникает впечатление что объект магическим образом оказывается в нескольких местах одновременно. Давайте я продемонстрирую это на примере.
-
-
 
 ## [Место где можно пустить корни](file:///D:/Users/a.lemekhov/Documents/game_programming_patterns_content/2.2-flyweight.html#place-to-put-down-roots) {#место-где-можно-пустить-корни}
 
@@ -149,31 +122,25 @@ double
 > В конце концов мы усвоили наш урок с этим лесом.
 
 ```
-enum
- Terrain
+enum Terrain
 {
   TERRAIN_GRASS,
   TERRAIN_HILL,
   TERRAIN_RIVER
-  
-// Other terrains...
+
+  // Other terrains...
 
 };
-
 ```
 
 А сам мир хранит здоровенный массив этих значений:
 
 ```
-class
- World
+class World
 {
-    
-private
-:
-        Terrain tiles_[WIDTH][HEIGHT];
+        private:
+                Terrain tiles_[WIDTH][HEIGHT];
 };
-
 ```
 
 > Я использую для хранения 2D сетки многомерный массив. В C++ это эффективно, потому что все элементы упакованы в одном месте. В Java и других языках с управлением памятью, мы бы получили просто массив строк, каждый из элементов которого был бы _ссылкой_ на массив элементов столбика. Т.е. особой эффективностью в работе с памятью здесь не пахнет.
@@ -183,77 +150,28 @@ private
 Чтобы получить полезную информацию о тайле используется нечто наподобие:
 
 ```
-int
- World::getMovementCost(
-int
- x, 
-int
- y)
+int World::getMovementCost(int x, int y)
 {
-  
-switch
- (tiles_[x][y])
+  switch (tiles_[x][y])
   {
-    
-case
- TERRAIN_GRASS: 
-return
-1
-;
-    
-case
- TERRAIN_HILL:  
-return
-3
-;
-    
-case
- TERRAIN_RIVER: 
-return
-2
-;
-    
-// Other terrains...
-
+    case TERRAIN_GRASS: return 1;
+    case TERRAIN_HILL: return 3;
+    case TERRAIN_RIVER: return 2;
+    // Other terrains...
   }
 }
 
 
-bool
- World::isWater(
-int
- x, 
-int
- y)
+bool World::isWater(int x, int y)
 {
-  
-switch
- (tiles_[x][y])
+  switch (tiles_[x][y])
   {
-    
-case
- TERRAIN_GRASS: 
-return
-false
-;
-    
-case
- TERRAIN_HILL:  
-return
-false
-;
-    
-case
- TERRAIN_RIVER: 
-return
-true
-;
-    
-// Other terrains...
-
+     case TERRAIN_GRASS: return false;
+     case TERRAIN_HILL: return false;
+     case TERRAIN_RIVER: return true;
+     // Other terrains...
   }
 }
-
 ```
 
 Ну, идею вы поняли. Такой подход работает, но я нахожу его уродливым. Когда я думаю о скорости перемещения по местности я предполагаю увидеть _данные_ о местности, а они вместо этого внедрены в код. Еще хуже то, что данные об одном типе местности размазаны по целой куче методов. Хотелось бы видеть все это инкапсулированным в одном месте. В конце концов именно для этого и предназначены объекты.
@@ -261,63 +179,24 @@ true
 Было бы здорово иметь настоящий класс для местности наподобие такого:
 
 ```
-class
- Terrain
+class Terrain
 {
-    
-public
-:
-      Terrain(
-int
- movementCost,
-              
-bool
- isWater,
-              Texture texture)
+  public:
+      Terrain(int movementCost, bool isWater, Texture texture)
       : movementCost_(movementCost),
         isWater_(isWater),
         texture_(texture)
       {}
 
+      int getMovementCost() const { return movementCost_; }
+      bool isWater() const { return isWater_; }
+      const Texture& getTexture() const { return texture_; }
       
-int
-getMovementCost
-()
-const
-{ 
-return
- movementCost_; }
-      
-bool
-isWater
-()
-const
-{ 
-return
- isWater_; }
-      
-const
- Texture
-&
-getTexture
-()
-const
-{ 
-return
- texture_; }
-
-    
-private
-:
-      
-int
- movementCost_;
-      
-bool
- isWater_;
+  private:
+      int movementCost_;
+      bool isWater_;
       Texture texture_;
 };
-
 ```
 
 > Вы можете заметить, что все методы здесь объявлены как const. Это не совпадение. Так как один и тот же объект используется в различном контексте, если мы его изменим, изменения одновременно произойдут и во всех остальных местах.
@@ -329,19 +208,12 @@ bool
 Принимая это во внимание, у нас нет причин иметь больше одного объекта для каждого типа местности. Каждый тайл травы идентичен любому другому. Вместо того, чтобы иметь массив перечислений или объектов `Terrain`, мы будем хранить массив _указателей_ на объекты `Terrain`:
 
 ```
-class
- World
+class World
 {
-    
-private
-:
-    Terrain* tiles_[WIDTH][HEIGHT];
-
-    
-// Другие вещи...
-
+    private:
+        Terrain* tiles_[WIDTH][HEIGHT];
+    // Другие вещи...
 };
-
 ```
 
 Каждый из тайлов, относящихся к одному типу местности указывает на один и тот же экземпляр местности.
@@ -351,114 +223,51 @@ private
 Так как экземпляры местности используются в нескольких местах, управлять их временем жизни будет сложнее, чем если бы мы создавали их динамически. Вместо этого мы будем прямо хранить их в мире:
 
 ```
-class
- World
+class World
 {
-    
-public
-:
-      World()
-      : grassTerrain_(
-1
-, 
-false
-, GRASS_TEXTURE),
-        hillTerrain_(
-3
-, 
-false
-, HILL_TEXTURE),
-        riverTerrain_(
-2
-, 
-true
-, RIVER_TEXTURE)
-      {}
+      public:
+            World() 
+            : grassTerrain_(1, false, GRASS_TEXTURE),
+              hillTerrain_(3, false, HILL_TEXTURE),
+              riverTerrain_(2, true, RIVER_TEXTURE)
+            {}
 
-    
-private
-:
+private:
       Terrain grassTerrain_;
       Terrain hillTerrain_;
       Terrain riverTerrain_;
 
-      
-// Other stuff...
+      // Other stuff...
 
 };
-
 ```
 
 Теперь мы можем использовать их для отрисовки земли следующим образом:
 
 ```
-void
- World::generateTerrain()
+void World::generateTerrain()
 {
-  
-// Fill the ground with grass.
-for
- (
-int
- x = 
-0
-; x 
-<
- WIDTH; x++)
-  {
-    
-for
- (
-int
- y = 
-0
-; y 
-<
- HEIGHT; y++)
-    {
-      
-// Sprinkle some hills.
-if
- (random(
-10
-) == 
-0
-)
-      {
-        tiles_[x][y] = 
-&
-hillTerrain_;
-      }
-      
-else
 
-      {
-        tiles_[x][y] = 
-&
-grassTerrain_;
+  // Fill the ground with grass.
+  for (int x = 0; x < WIDTH; x++) {
+    for (int y = 0; y < HEIGHT; y++) {
+      // Sprinkle some hills.
+      if (random(10) == 0) {
+        tiles_[x][y] = &hillTerrain_;
+      }
+      else {
+        tiles_[x][y] = &grassTerrain_;
       }
     }
   }
 
-  
-// Lay a river.
-int
- x = random(WIDTH);
-  
-for
- (
-int
- y = 
-0
-; y 
-<
- HEIGHT; y++) {
-    tiles_[x][y] = 
-&
-riverTerrain_;
+
+  // Lay a river.
+  int x = random(WIDTH);
+  for (int y = 0; y < HEIGHT; y++) {
+    tiles_[x][y] = &riverTerrain_;
   }
 }
-
 ```
 
 > Могу сказать что это не самый лучший в мире алгоритм процедурной генерации местности.
@@ -466,39 +275,19 @@ riverTerrain_;
 Дальше вместо методов в `World` для доступа к параметрам местности мы можем просто возвращать объект `Terrain` напрямую:
 
 ```
-const
- Terrain
-&
- World::getTile(
-int
- x, 
-int
- y) 
-const
-
+const Terrain& World::getTile(int x, int y) const
 {
-  
-return
- *tiles_[x][y];
+  return *tiles_[x][y];
 }
-
 ```
 
 Таким образом `World` больше не перегружен различной информацией о местности. Если вам нужны некоторые параметры тайла, вы можете получить их у самого объекта:
 
 ```
-int
- cost = world.getTile(
-2
-, 
-3
-).getMovementCost();
-
+int cost = world.getTile(2, 3).getMovementCost();
 ```
 
 Мы снова вернулись к приятному API работы с реальным объектом и добились этого практически без дополнительных накладных расходов: указатель обычно занимает не больше места чем перечисление.
-
-
 
 ## [Что насчет производительности?](file:///D:/Users/a.lemekhov/Documents/game_programming_patterns_content/2.2-flyweight.html#what-about-performance) {#что-насчет-производительности}
 
@@ -510,15 +299,10 @@ int
 
 В чем _я_ точно уверен, так это в том, что использование объекта приспособленца скидывать со счетов не стоит. Он дает вам преимущества объектно-ориентированного стиля без расходов на кучу дополнительных объектов. Если вы ловите себя на создании множества последовательностей, а затем организовываете по ним выбор с помощью `switch`, попробуйте использовать шаблон. Ну а если боитесь за производительность, то по крайней мере проверьте свои опасения профайлером прежде, чем приводить свой код в менее поддерживаемую форму.
 
-
-
 ## [Смотрите также](file:///D:/Users/a.lemekhov/Documents/game_programming_patterns_content/2.2-flyweight.html#see-also) {#смотрите-также}
 
 * В примере с тайлами мы сразу создали экземпляры для каждого типа местности и сохранили их в 
-  `World`
-  . Таким образом мы получили возможность переиспользовать и разделять экземпляры. Во многих других случаях у вас не будет желания создавать сразу 
-  _всех_
-   возможных приспособленцев.
+  `World`. Таким образом мы получили возможность переиспользовать и разделять экземпляры. Во многих других случаях у вас не будет желания создавать сразу _всех_ возможных приспособленцев.
 
 Если вы не можете предугадать, какие из них вам понадобятся, возможно лучше создавать их по запросу. Чтобы воспользоваться преимуществом разделения ресурсов вы можете организовать проверку, не загружен ли уже нужный вам экземпляр. Если загружен, вы просто возвращаете этот экземпляр.
 
@@ -526,9 +310,7 @@ int
 
 Чтобы иметь возможность возвратить ранее созданного приспособленцы, вам нужно хранить пул уже загруженных объектов. Если называть имена, то для их хранения можно использовать Пул объектов \([Object Pool](file:///D:/Users/a.lemekhov/Documents/game_programming_patterns_content/6.3-object-pool.html)\).
 
-* Когда вы используете шаблон Состояние \(
-  [State](file:///D:/Users/a.lemekhov/Documents/game_programming_patterns_content/2.6-state.html)
-  \) у вас часто возникает объект "состояние", который не имеет никаких полей, специфичных для машины, на которой это состояние используется. Для этого вполне достаточна сущность и методы состояния. В этом случае вы можете легко применять этот шаблон и переиспользовать один и тот же экземпляр состояния одновременное во множестве машин состояний.
+* Когда вы используете шаблон Состояние \([State](file:///D:/Users/a.lemekhov/Documents/game_programming_patterns_content/2.6-state.html)\) у вас часто возникает объект "состояние", который не имеет никаких полей, специфичных для машины, на которой это состояние используется. Для этого вполне достаточна сущность и методы состояния. В этом случае вы можете легко применять этот шаблон и переиспользовать один и тот же экземпляр состояния одновременное во множестве машин состояний.
 
 
 
