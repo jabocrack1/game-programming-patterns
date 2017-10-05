@@ -19,10 +19,9 @@
 
 Если набросать описывающий все это код, получится нечто подобное:
 
-```
+```cpp
 class Tree
 {
-
         private:
                 Mesh mesh_;
                 Texture bark_;
@@ -47,7 +46,7 @@ class Tree
 
 Мы можем смоделировать это явным образом путем разделения объекта пополам. Во-первых, мы достанем данные, общие для всех деревьев, и переместим их в отдельный класс:
 
-```
+```cpp
 class TreeModel
 {
       private:
@@ -59,7 +58,7 @@ class TreeModel
 
 Игре нужен только один экземпляр этого класса, потому что нам незачем иметь тысячи копий одной и той же сетки и текстуры. Поэтому каждый _экземпляр_ дерева в мире должен иметь _ссылку_ на общий `TreeModel`. В `Tree` останутся данные, индивидуальные для каждого экземпляра:
 
-```
+```cpp
 class Tree
 {
       private:
@@ -121,7 +120,7 @@ class Tree
 
 > В конце концов мы усвоили наш урок с этим лесом.
 
-```
+```cpp
 enum Terrain
 {
   TERRAIN_GRASS,
@@ -135,7 +134,7 @@ enum Terrain
 
 А сам мир хранит здоровенный массив этих значений:
 
-```
+```cpp
 class World
 {
         private:
@@ -149,7 +148,7 @@ class World
 
 Чтобы получить полезную информацию о тайле используется нечто наподобие:
 
-```
+```cpp
 int World::getMovementCost(int x, int y)
 {
   switch (tiles_[x][y])
@@ -178,7 +177,7 @@ bool World::isWater(int x, int y)
 
 Было бы здорово иметь настоящий класс для местности наподобие такого:
 
-```
+```cpp
 class Terrain
 {
   public:
@@ -222,7 +221,7 @@ class World
 
 Так как экземпляры местности используются в нескольких местах, управлять их временем жизни будет сложнее, чем если бы мы создавали их динамически. Вместо этого мы будем прямо хранить их в мире:
 
-```
+```cpp
 class World
 {
       public:
@@ -232,10 +231,10 @@ class World
               riverTerrain_(2, true, RIVER_TEXTURE)
             {}
 
-private:
-      Terrain grassTerrain_;
-      Terrain hillTerrain_;
-      Terrain riverTerrain_;
+      private:
+            Terrain grassTerrain_;
+            Terrain hillTerrain_;
+            Terrain riverTerrain_;
 
       // Other stuff...
 
@@ -244,10 +243,9 @@ private:
 
 Теперь мы можем использовать их для отрисовки земли следующим образом:
 
-```
+```cpp
 void World::generateTerrain()
 {
-
   // Fill the ground with grass.
   for (int x = 0; x < WIDTH; x++) {
     for (int y = 0; y < HEIGHT; y++) {
@@ -260,7 +258,6 @@ void World::generateTerrain()
       }
     }
   }
-
 
   // Lay a river.
   int x = random(WIDTH);
