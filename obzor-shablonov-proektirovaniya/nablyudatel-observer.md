@@ -2,7 +2,7 @@
 
 Мы не сможете бросить камень в винчестер и не попасть в приложение, построенное с использованием архитектуры
 
-Модель-Вид-Контроллер \(Model-View-Controller\) \([https://ru.wikipedia.org/wiki/Model-View-Controller](https://ru.wikipedia.org/wiki/Model-View-Controller)\), в основе которой как раз и лежит шаблон Наблюдатель. Наблюдатель настолько распространен, что даже включен в Java в библиотеку ядра \([java.util.Observer](http://docs.oracle.com/javase/7/docs/api/java/util/Observer.html)\), а в C\# вообще является частью языка \(ключевое слово [event](http://msdn.microsoft.com/en-us/library/8627sbea.aspx)\).
+[Модель-Вид-Контроллер \(Model-View-Controller\)](https://ru.wikipedia.org/wiki/Model-View-Controller), в основе которой как раз и лежит шаблон Наблюдатель. Наблюдатель настолько распространен, что даже включен в Java в библиотеку ядра \([java.util.Observer](http://docs.oracle.com/javase/7/docs/api/java/util/Observer.html)\), а в C\# вообще является частью языка \(ключевое слово [event](http://msdn.microsoft.com/en-us/library/8627sbea.aspx)\).
 
 Наблюдатель - один из самых используемых и широко известных шаблонов Банды четырех, но так как по какой-то непонятной причине мир игровой разработки зачастую обособлен, возможно для вас он станет новинкой. Ну а если вы не только что покинули монастырь, у меня для вас припасен мотивирующий пример.
 
