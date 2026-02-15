@@ -4,7 +4,7 @@
 
 ![](/assets/gpp-logo.png)
 
-[Оглавление](README.md)
+[Оглавление](SUMMARY.md)
 
 Эй, Разработчик Игр!
 
